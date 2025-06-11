@@ -45,13 +45,11 @@ pipeline {
             steps {
                 sshagent (credentials: ['ec2-ssh-key-id']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} << 'ENDSSH'
-                      docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                      docker stop eureka-service || true
-                      docker rm eureka-service || true
-                      docker container prune -f || true
-                      docker run -d --name eureka-service -p 8761:8761 -e EUREKA_URL='${params.EUREKA_URL}' ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                    ENDSSH
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} "docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} "docker stop eureka-service || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} "docker rm eureka-service || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} "docker container prune -f || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} "docker run -d --name eureka-service -p 8761:8761 -e EUREKA_URL='${params.EUREKA_URL}' ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     """
                 }
             }

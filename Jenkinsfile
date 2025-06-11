@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'EUREKA_URL', defaultValue: 'http://gpadmin:1234@10.0.11.103:8761/eureka', description: 'Eureka 서버 URL')
+        string(name: 'EUREKA_URL', defaultValue: 'http://10.0.11.103:8761/eureka', description: 'Eureka 서버 URL')
     }
 
     environment {
@@ -34,7 +34,7 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
                     sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                 }

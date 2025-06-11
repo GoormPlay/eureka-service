@@ -22,6 +22,7 @@ pipeline {
             steps {
                 sh 'chmod +x ./gradlew' // Permission 문제 방지
                 sh './gradlew clean build -x test'
+                sh 'cp build/libs/*.jar build/libs/app.jar'
             }
         }
 

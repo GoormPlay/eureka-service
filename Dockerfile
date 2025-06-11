@@ -10,7 +10,7 @@ ENV EUREKA_URL=${EUREKA_URL}
 WORKDIR /app
 
 # 빌드된 JAR 파일 복사 (경로 맞춰야 함)
-COPY build/libs/eureka-service-*.jar app.jar
+COPY build/libs/app.jar app.jar
 
 EXPOSE 8761
 

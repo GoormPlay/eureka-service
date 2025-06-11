@@ -8,7 +8,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'roin09/eureka-service'
         DOCKER_IMAGE_TAG = 'latest'
-        DEPLOY_HOST = '10.0.11.103' // 배포 서버 Private IP
+        DEPLOY_HOST = '10.0.11.103'
     }
 
     stages {
@@ -20,6 +20,7 @@ pipeline {
 
         stage('Build JAR') {
             steps {
+                sh 'chmod +x ./gradlew' // Permission 문제 방지
                 sh './gradlew clean build -x test'
             }
         }
@@ -41,12 +42,13 @@ pipeline {
 
         stage('Deploy to EC2 via SSH') {
             steps {
-                sshagent (credentials: ['ec2-ssh-key']) {
+                sshagent (credentials: ['ec2-ssh-key-id']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} << 'ENDSSH'
                       docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                       docker stop eureka-service || true
                       docker rm eureka-service || true
+                      docker container prune -f || true
                       docker run -d --name eureka-service -p 8761:8761 -e EUREKA_URL='${params.EUREKA_URL}' ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     ENDSSH
                     """

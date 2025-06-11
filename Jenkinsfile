@@ -22,7 +22,7 @@ pipeline {
             steps {
                 sh 'chmod +x ./gradlew' // Permission 문제 방지
                 sh './gradlew clean build -x test'
-                sh 'cp build/libs/*.jar build/libs/app.jar'
+                sh 'cp build/libs/eureka-service-0.0.1-SNAPSHOT.jar build/libs/app.jar'
             }
         }
 

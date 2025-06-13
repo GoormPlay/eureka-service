@@ -16,6 +16,7 @@ spec:
       containers:
         - name: eureka-service
           image: roin09/eureka-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8761
           envFrom:

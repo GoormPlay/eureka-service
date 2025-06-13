@@ -4,4 +4,4 @@ metadata:
   name: eureka-config
   namespace: eureka
 data:
-  EUREKA_URL: http://eureka-service:8761/eureka
+  EUREKA_URL: http://eureka-service.eureka.svc.cluster.local:8761/eureka

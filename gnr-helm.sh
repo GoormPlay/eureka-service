@@ -91,12 +91,16 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
+          {{- if .Values.useSecret }}
           envFrom:
             - configMapRef:
                 name: {{ .Chart.Name }}-config
-          {{- if .Values.useSecret }}
             - secretRef:
                 name: {{ .Chart.Name }}-secret
+          {{- else }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-config
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -110,6 +114,7 @@ spec:
               app: {{ .Chart.Name }}
       {{- end }}
 EOF
+
 
 # service.yaml
 cat > "$CHART_DIR/templates/service.yaml" <<EOF

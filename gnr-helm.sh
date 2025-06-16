@@ -45,11 +45,11 @@ config:
 
 resources:
   requests:
-    cpu: 200m
-    memory: 512Mi
+    cpu: 100m
+    memory: 256Mi
   limits:
-    cpu: 500m
-    memory: 1Gi
+    cpu: 300m
+    memory: 512Mi
 
 hpa:
   enabled: true
@@ -61,6 +61,9 @@ topologySpreadConstraints:
   enabled: true
   maxSkew: 1
   topologyKey: topology.kubernetes.io/zone
+
+podAntiAffinity:
+  enabled: true
 
 useSecret: false
 EOF
@@ -93,16 +96,12 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
-          {{- if .Values.useSecret }}
           envFrom:
             - configMapRef:
                 name: {{ .Chart.Name }}-config
+          {{- if .Values.useSecret }}
             - secretRef:
                 name: {{ .Chart.Name }}-secret
-          {{- else }}
-          envFrom:
-            - configMapRef:
-                name: {{ .Chart.Name }}-config
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -115,8 +114,21 @@ spec:
             matchLabels:
               app: {{ .Chart.Name }}
       {{- end }}
+      {{- if .Values.podAntiAffinity.enabled }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ .Chart.Name }}
+      {{- end }}
 EOF
-
 
 # service.yaml
 cat > "$CHART_DIR/templates/service.yaml" <<EOF
